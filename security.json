@@ -1,0 +1,238 @@
+{
+    "rules": {
+        "billing": {
+          "sites": {
+            "$site" : {
+             ".read":  "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))",
+             "active": {
+               ".read":  "root.child('management/sites/' + $site + '/users').hasChild(auth.email.replace('.', ',1'))"
+             },
+             "status": {
+               ".read":  "root.child('management/sites/' + $site + '/users').hasChild(auth.email.replace('.', ',1'))"
+             },
+             "endTrial": {
+               ".read":  "root.child('management/sites/' + $site + '/users').hasChild(auth.email.replace('.', ',1'))"
+             },
+            }
+          }
+        },
+        "buckets": {
+          ".read": false,
+          ".write": false,
+          "$site": {
+            ".read": false,
+            "$bucket": {
+              // Anyone can read to it as long as its active
+              ".read": "!root.child('billing/sites/' + $site).hasChild('active') || root.child('billing/sites/' + $site + '/active').val() == true",
+              // Make sure the key is the bucket name, to avoid people trying to fuck with it
+              ".validate": "$bucket == root.child('management/sites/' + $site + '/key').val()"
+            },
+            // Have to be an owner of the site, a user of the site, and the site needs to be active to write to it
+            ".write": "(!root.child('billing/sites/' + $site).hasChild('active') || root.child('billing/sites/' + $site + '/active').val() == true) && 
+                       (root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1')) || 
+                       root.child('management/sites/' + $site + '/users').hasChild(auth.email.replace('.', ',1')))"
+          }
+        },
+        "management": {
+          ".read": false,
+          ".write": false,
+          "backups": {
+            ".read": true
+          },
+          "commands": {
+            "dns": {
+              "$command" : {
+                ".read": "false",
+                ".write": "root.child('management/sites/' + $command + '/owners').hasChild(auth.email.replace('.', ',1')) &&
+                           (!root.child('billing/sites/' + $command).hasChild('active') || root.child('billing/sites/' + $command + '/active').val() == true)",
+                // Users can submit a command per site, and makes sure the commands email is the same as the auth
+                ".validate": "newData.hasChildren(['dnsname'])",
+                "dnsname": {
+                 ".validate": "newData.isString()" 
+                },
+                "id": {
+                  ".validate": true
+                },
+                "$other": {
+                 ".validate": false 
+                }
+              }
+            },
+            "invite" : {
+              "$command" : {
+                ".write": "!data.exists() && newData.child('from_userid').val() == auth.email &&
+                            root.child('management/sites/' + newData.child('siteref').val() + '/owners').hasChild(auth.email.replace('.', ',1'))",
+                ".validate": "newData.hasChildren(['userid', 'from_userid', 'siteref'])",
+                "userid": {
+                  ".validate": "newData.isString()" 
+                },
+                "from_userid": {
+                  ".validate": "newData.isString()" 
+                },
+                "siteref": {
+                  ".validate": true
+                },
+                "id": {
+                  ".validate": true
+                },
+                "$other": {
+                 ".validate": false 
+                }
+              }
+            },
+            "create" : {
+              "$command" : {
+                // Only creators of the command can read it
+                ".read": "data.child('userid').val() == auth.email",
+                // Once you've written it, you cant change it
+                ".write": "!data.exists() || data.child('userid').val() == auth.email",
+                ".validate": "newData.hasChildren(['userid', 'sitename'])",
+                "userid": {
+                 ".validate": "newData.isString()" 
+                },
+                "sitename": {
+                 ".validate": "newData.isString()" 
+                },
+                "id": {
+                 ".validate": true
+                },
+                "$other": {
+                 ".validate": false 
+                }
+              }
+            },
+            "build" : {
+              "$command" : {
+                ".read": "data.child('userid').val() == auth.email",
+                ".write": "true",
+                // Users can submit a command per site, and makes sure the commands email is the same as the auth
+                ".validate": "newData.hasChildren(['userid', 'sitename']) && newData.child('userid').val() == auth.email",
+                "userid": {
+                 ".validate": "newData.isString()" 
+                },
+                "sitename": {
+                 ".validate": "newData.isString()" 
+                },
+                "build_time" : {
+                 ".validate": true
+                },
+                "id": {
+                 ".validate": true
+                },
+                "$other": {
+                 ".validate": false 
+                }
+              }
+            },
+          },
+          "sites": {
+            "$site" : {
+              "owners": {
+                ".write": "!data.exists()",
+                "_type": {
+                  ".validate": false
+                },
+                "$user": {
+                  // Owners can only ever be added by owners ever dog
+                  ".write": "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))",
+                  ".validate": "(!data.parent().exists())"
+                }
+              },
+              "users": {
+                "_type": {
+                  ".validate": false
+                },
+                "$user": {
+                  // A user can only write to this if that user is an owner, or the user is on the potential users list (and is the one writing)
+                  ".write": "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1')) ||
+                             (root.child('management/sites/' + $site + '/potential_users/' + $user).exists() == true && $user == auth.email.replace('.', ',1'))",
+                }
+              },
+              "potential_users": {
+                "_type": {
+                  ".validate": false
+                },
+                "$user": {
+                  // Users can only be added to the potential list if they are added by the owner, but users can remove themselves
+                  ".write": "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1')) ||
+                             (newData.val() === null && $user == auth.email.replace('.', ',1'))"
+                }
+              },
+              "key": {
+                ".write": "false",
+                ".validate": "newData.isString()"
+              },
+              "active" : {
+                ".write": "false",
+                ".validate" : "newData.isBoolean()"
+              },
+              "dns": {
+                ".write": "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))",
+                ".read" : true
+              },
+              "messages": {
+                ".write": false,
+                "$message": {
+                  "message": {
+                    ".validate": true 
+                  },
+                  "timestamp": {
+                    ".validate": true
+                  },
+                  "status": {
+                    ".validate": true 
+                  },
+                  "code": {
+                    ".validate": true 
+                  },
+                  "$other": {
+                    ".validate": false
+                  },
+                },
+              },
+              "error": {
+                ".read": true,
+                ".write": "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))",
+              },
+              "$other": {
+                ".validate": false 
+              },
+              ".validate": "newData.hasChildren(['owners']) && $site === $site.toLowerCase()",
+              // Owners and users can read all the information in here, potential users can not
+              ".read": "data.exists() && (data.child('owners').hasChild(auth.email.replace('.', ',1')) || data.child('users').hasChild(auth.email.replace('.', ',1')))",
+              ".write": false
+            },
+          },
+          "users": {
+            "$user": {
+              "sites": {
+                "users" : { 
+                  "$site" : {
+                    ".write": "$user === auth.email.replace('.', ',1') || root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))"
+                  }
+                },
+                "owners" : {  
+                  "$site" : {
+                    ".write": "$user === auth.email.replace('.', ',1') || root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))"
+                  }
+                },
+                ".read": "$user === auth.email.replace('.', ',1')",
+                "$site" : {
+                  ".write": "$user === auth.email.replace('.', ',1') || root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))"
+                }
+              },
+              "exists": {
+                ".write": "$user === auth.email.replace('.', ',1')",
+                ".read": true,
+                ".validate": "newData.isBoolean()"
+              },
+              "$other": {
+                ".validate": false
+              }
+            },
+          },
+        },
+        ".read": "false",
+        ".write": "false"
+    }
+}

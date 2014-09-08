@@ -1,0 +1,7 @@
+<%= fromUser %> has invited you to edit their website using the Webhook content management system.
+
+Website:
+<%= siteUrl %>
+
+Click here to verify your email and login.
+<%= url %>
