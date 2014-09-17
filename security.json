@@ -205,6 +205,9 @@
           },
           "users": {
             "$user": {
+              "verification": {
+                ".read": true
+              },
               "sites": {
                 "users" : { 
                   "$site" : {
@@ -228,8 +231,7 @@
               },
               "$other": {
                 ".validate": false
-              },
-              ".read": true
+              }
             }
           }
         },
