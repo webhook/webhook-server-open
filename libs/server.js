@@ -68,6 +68,10 @@ var cleanUpFiles = function(req) {
 
 module.exports.start = function(config, logger)
 {
+  if (config.get('newrelicEnabled')) {
+    require('newrelic');
+  }
+
   cloudStorage.setProjectName(config.get('googleProjectId'));
   cloudStorage.setServiceAccount(config.get('googleServiceAccount'));
   fireUtil.configUtils(config);
