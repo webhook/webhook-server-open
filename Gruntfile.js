@@ -33,9 +33,10 @@ module.exports = function(grunt) {
     elasticUser: 'myelasticuser',                                       // The read/write user on your elastic server
     elasticPassword: 'myelasticuserpassword',                           // The password for your elastic user
     googleProjectId: 'mygoogleproject',                                 // Your google project ID. Usually something like whatever-123
-    sitesBucket: 'your-company-name-sites',                      // The name of the build bucket on Google Cloud Storage
+    sitesBucket: 'your-company-name-sites',                             // The name of the build bucket on Google Cloud Storage
     backupBucket: 'your-company-name-backups',                          // The name of the backup bucket on Google Cloud Storage
     googleServiceAccount: 'long_string@developer.gserviceaccount.com',  // The email of your projects Service Acccount
+    newrelicEnabled: false,                                             // Set to true to enable NewRelic monitoring (also make sure that a newrelic.js file exists)
     memcachedServers: [
       'localhost:11211'
     ],
