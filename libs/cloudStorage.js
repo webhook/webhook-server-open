@@ -149,7 +149,7 @@ module.exports.buckets = {
   get: function(bucketName, callback) {
 
     jsonRequest({
-      url: 'https://www.googleapis.com/storage/v1beta2/b/' + bucketName,
+      url: 'https://www.googleapis.com/storage/v1/b/' + bucketName,
       method: 'GET'
     }, callback);
   },
@@ -177,7 +177,7 @@ module.exports.buckets = {
     };
 
     jsonRequest({
-      url: 'https://www.googleapis.com/storage/v1beta2/b/',
+      url: 'https://www.googleapis.com/storage/v1/b/',
       qs: { project: projectName },
       data: data,
       method: 'POST'
@@ -193,7 +193,7 @@ module.exports.buckets = {
     };
 
     jsonRequest({
-      url: 'https://www.googleapis.com/storage/v1beta2/b/' + bucketName + '/defaultObjectAcl',
+      url: 'https://www.googleapis.com/storage/v1/b/' + bucketName + '/defaultObjectAcl',
       data: data,
       method: 'POST',
     }, function() {
@@ -204,7 +204,7 @@ module.exports.buckets = {
       }
 
       jsonRequest({
-        url: 'https://www.googleapis.com/storage/v1beta2/b/' + bucketName + '/defaultObjectAcl',
+        url: 'https://www.googleapis.com/storage/v1/b/' + bucketName + '/defaultObjectAcl',
         data: data,
         method: 'POST',
       }, callback);
@@ -223,7 +223,7 @@ module.exports.buckets = {
     };
 
     jsonRequest({
-      url: 'https://www.googleapis.com/storage/v1beta2/b/' + bucketName,
+      url: 'https://www.googleapis.com/storage/v1/b/' + bucketName,
       data: data,
       method: 'PATCH'
     }, callback);
@@ -232,7 +232,7 @@ module.exports.buckets = {
   // Deletes an empty bucket from cloud storage
   del: function(bucketName, callback) {
     jsonRequest({
-      url: 'https://www.googleapis.com/storage/v1beta2/b/' + bucketName,
+      url: 'https://www.googleapis.com/storage/v1/b/' + bucketName,
       method: 'DELETE'
     }, callback);
   }
@@ -245,7 +245,7 @@ module.exports.objects = {
   // List all objects in a bucket (name, md5hash)
   list: function(bucket, callback) {
     jsonRequest({
-      url: 'https://www.googleapis.com/storage/v1beta2/b/' + bucket + '/o',
+      url: 'https://www.googleapis.com/storage/v1/b/' + bucket + '/o',
       qs: { fields: 'kind,items(name,md5Hash)', delimiter: 'webhook-uploads/' }
     }, callback);
   },
@@ -253,7 +253,7 @@ module.exports.objects = {
   // List all objects with more information (md5hash, updated time)
   listMore: function(bucket, callback) {
     jsonRequest({
-      url: 'https://www.googleapis.com/storage/v1beta2/b/' + bucket + '/o',
+      url: 'https://www.googleapis.com/storage/v1/b/' + bucket + '/o',
       qs: { fields: 'kind,items(name,md5Hash,updated)', delimiter: 'webhook-uploads/' }
     }, callback);
   },
@@ -301,7 +301,7 @@ module.exports.objects = {
     }
 
     jsonRequest({
-      url: 'https://www.googleapis.com/upload/storage/v1beta2/b/' + bucket + '/o',
+      url: 'https://www.googleapis.com/upload/storage/v1/b/' + bucket + '/o',
       qs: { uploadType: 'multipart' },
       headers: {
         'content-type' : 'multipart/form-data'
@@ -348,7 +348,7 @@ module.exports.objects = {
     var now = Date.now();
     zlib.gzip(fileContent, function(err, content) {
       jsonRequest({
-        url: 'https://www.googleapis.com/upload/storage/v1beta2/b/' + bucket + '/o',
+        url: 'https://www.googleapis.com/upload/storage/v1/b/' + bucket + '/o',
         qs: { uploadType: 'multipart' },
         headers: {
           'content-type' : 'multipart/form-data'
@@ -373,7 +373,7 @@ module.exports.objects = {
   // Delete an object from bucket
   del: function(bucket, filename, callback) {
     jsonRequest({
-      url: 'https://www.googleapis.com/storage/v1beta2/b/' + bucket + '/o/' + encodeURIComponent(filename),
+      url: 'https://www.googleapis.com/storage/v1/b/' + bucket + '/o/' + encodeURIComponent(filename),
       method: 'DELETE'
     }, callback);
   }
