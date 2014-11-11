@@ -32,6 +32,11 @@ module.exports = function(grunt) {
     elasticServer: 'myelasticserver.com',                               // The address of your elastic server
     elasticUser: 'myelasticuser',                                       // The read/write user on your elastic server
     elasticPassword: 'myelasticuserpassword',                           // The password for your elastic user
+    //elasticOptions: {                                                 // This block is completely optional but useful if you need to specify
+    //  port: 9200,                                                     // more elasticsearch options. Possible keys are :
+    //  secure: false,                                                  // port, secure, defaultMethod, params, path, timeout, keepAlive and agent
+    //  defaultMethod: 'GET'                                            // Uncomment this block and fill in your required values if needed
+    //},
     googleProjectId: 'mygoogleproject',                                 // Your google project ID. Usually something like whatever-123
     sitesBucket: 'your-company-name-sites',                             // The name of the build bucket on Google Cloud Storage
     backupBucket: 'your-company-name-backups',                          // The name of the backup bucket on Google Cloud Storage
