@@ -23,6 +23,7 @@ var temp = require('temp');
 var mime = require('mime');
 var ElasticSearchClient = require('elasticsearchclient');
 var archiver   = require('archiver');
+var _ = require('lodash');
 
 // Some string functions worth having
 String.prototype.endsWith = function(suffix) {
@@ -89,6 +90,10 @@ module.exports.start = function(config, logger)
         password: config.get('elasticPassword')
     }
   };
+  if (config.get('elasticOptions'))
+  {
+    _.extend(elasticOptions, config.get('elasticOptions'));
+  }
 
   var elastic = new ElasticSearchClient(elasticOptions);
   
