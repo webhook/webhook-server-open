@@ -257,7 +257,7 @@
               },
               "api-key": {
                 ".read": "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))",
-                ".write": "!data.exists() && root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))"
+                ".write": "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))"
               },
               ".validate": "newData.hasChildren(['owners']) && $site === $site.toLowerCase()",
               // Owners and users can read all the information in here, potential users can not
