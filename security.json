@@ -22,15 +22,61 @@
           "$site": {
             ".read": false,
             "$bucket": {
+              "dev": {
+                "contentType": {
+                  "$type" : {
+                    "controls" : {
+                      "$control" : {
+                        ".write" : "
+                                    (!root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1')).exists() && // Editor
+                                           root.child('management/sites/'+ $site + '/users').hasChild(auth.email.replace('.', ',1'))) || 
+                                    (root.child('management/sites/'+ $site + '/users').hasChild(auth.email.replace('.', ',1')) &&
+                                    (root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1') + '/' + $type).val() == 'publish' ||
+                                    root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1') + '/' + $type).val() == 'draft' ||
+                                    root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1') + '/' + $type).val() == 'delete' ||
+                                    root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1') + '/' + $type).val() == 'view') &&
+                                    (!data.exists() && (newData.child('name').val() == 'preview_url' || 
+                                                        newData.child('name').val() == 'slug' || 
+                                                        newData.child('name').val() == 'create_date' ||
+                                                        newData.child('name').val() == 'last_updated' ||
+                                                        newData.child('name').val() == 'publish_date')))" 
+                      }
+                    }
+                  }
+                },
+                "presence": {
+                  ".write": "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1')) || root.child('management/sites/'+ $site + '/users').hasChild(auth.email.replace('.', ',1'))"
+                },
+                "data": {
+                  ".write": "(!root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1')).exists() && // Editor
+                                           root.child('management/sites/'+ $site + '/users').hasChild(auth.email.replace('.', ',1')))",
+                  "$type": {
+                      ".write": "root.child('buckets/' + $site + '/' + $bucket + '/dev/contentType/' + $type + '/oneOff').val() == true &&
+                                ((newData.val() !== null && 
+                                  root.child('management/sites/'+ $site + '/users').hasChild(auth.email.replace('.', ',1')) && 
+                                  root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1') + '/' + $type).val() == 'publish'))",
+                      "$id" : {
+                        ".write": "(!root.child('buckets/' + $site + '/' + $bucket + '/dev/contentType/' + $type + '/oneOff').exists() || // Not a one off means this is the list
+                                     root.child('buckets/' + $site + '/' + $bucket + '/dev/contentType/' + $type + '/oneOff').val() == false) &&
+                                     root.child('management/sites/'+ $site + '/users').hasChild(auth.email.replace('.', ',1')) &&
+                                   (root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1') + '/' + $type).val() == 'delete' || // Deleter has full reign
+                                   (newData.val() !== null && 
+                                     root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1') + '/' + $type).val() == 'publish') || // Publish can do anything but delete
+                                   (newData.child('publish_date').val() == null &&
+                                     root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1') + '/' + $type).val() == 'draft'))",
+                      }
+                  },
+                },
+                "$other": {
+                  ".validate": false
+                },
+              },
+              ".write": "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))",
               // Anyone can read to it as long as its active
               ".read": "!root.child('billing/sites/' + $site).hasChild('active') || root.child('billing/sites/' + $site + '/active').val() == true",
               // Make sure the key is the bucket name, to avoid people trying to fuck with it
-              ".validate": "$bucket == root.child('management/sites/' + $site + '/key').val()"
+              ".validate": "$bucket == root.child('management/sites/' + $site + '/key').val() && (!root.child('billing/sites/' + $site).hasChild('active') || root.child('billing/sites/' + $site + '/active').val() == true)",
             },
-            // Have to be an owner of the site, a user of the site, and the site needs to be active to write to it
-            ".write": "(!root.child('billing/sites/' + $site).hasChild('active') || root.child('billing/sites/' + $site + '/active').val() == true) && 
-                       (root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1')) || 
-                       root.child('management/sites/' + $site + '/users').hasChild(auth.email.replace('.', ',1')))"
           }
         },
         "management": {
@@ -196,6 +242,16 @@
               },
               "$other": {
                 ".validate": false 
+              },
+              "groups": {
+               ".write" : "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))" 
+              },
+              "permissions": {
+               ".write": "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))"
+              },
+              "api-key": {
+                ".read": "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))",
+                ".write": "!data.exists() && root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))"
               },
               ".validate": "newData.hasChildren(['owners']) && $site === $site.toLowerCase()",
               // Owners and users can read all the information in here, potential users can not
