@@ -66,16 +66,6 @@
                                      root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1') + '/' + $type).val() == 'draft'))",
                       }
                   },
-                },
-                "settings": {
-                  ".write": "(!root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1')).exists() && // Editor
-                  root.child('management/sites/'+ $site + '/users').hasChild(auth.email.replace('.', ',1'))) &&
-                  (root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1')) ||
-                  root.child('management/sites/' + $site + '/users').hasChild(auth.email.replace('.', ',1')))"
-                }, 
-                "$other": {
-                  ".validate": false
-                },
               },
               ".write": "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))",
               // Anyone can read to it as long as its active
