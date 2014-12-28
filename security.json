@@ -29,17 +29,17 @@
                       "$control" : {
                         ".write" : "
                                     (!root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1')).exists() && // Editor
-                                           root.child('management/sites/'+ $site + '/users').hasChild(auth.email.replace('.', ',1'))) || 
+                                           root.child('management/sites/'+ $site + '/users').hasChild(auth.email.replace('.', ',1'))) ||
                                     (root.child('management/sites/'+ $site + '/users').hasChild(auth.email.replace('.', ',1')) &&
                                     (root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1') + '/' + $type).val() == 'publish' ||
                                     root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1') + '/' + $type).val() == 'draft' ||
                                     root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1') + '/' + $type).val() == 'delete' ||
                                     root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1') + '/' + $type).val() == 'view') &&
-                                    (!data.exists() && (newData.child('name').val() == 'preview_url' || 
-                                                        newData.child('name').val() == 'slug' || 
+                                    (!data.exists() && (newData.child('name').val() == 'preview_url' ||
+                                                        newData.child('name').val() == 'slug' ||
                                                         newData.child('name').val() == 'create_date' ||
                                                         newData.child('name').val() == 'last_updated' ||
-                                                        newData.child('name').val() == 'publish_date')))" 
+                                                        newData.child('name').val() == 'publish_date')))"
                       }
                     }
                   }
@@ -52,21 +52,27 @@
                                            root.child('management/sites/'+ $site + '/users').hasChild(auth.email.replace('.', ',1')))",
                   "$type": {
                       ".write": "root.child('buckets/' + $site + '/' + $bucket + '/dev/contentType/' + $type + '/oneOff').val() == true &&
-                                ((newData.val() !== null && 
-                                  root.child('management/sites/'+ $site + '/users').hasChild(auth.email.replace('.', ',1')) && 
+                                ((newData.val() !== null &&
+                                  root.child('management/sites/'+ $site + '/users').hasChild(auth.email.replace('.', ',1')) &&
                                   root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1') + '/' + $type).val() == 'publish'))",
                       "$id" : {
                         ".write": "(!root.child('buckets/' + $site + '/' + $bucket + '/dev/contentType/' + $type + '/oneOff').exists() || // Not a one off means this is the list
                                      root.child('buckets/' + $site + '/' + $bucket + '/dev/contentType/' + $type + '/oneOff').val() == false) &&
                                      root.child('management/sites/'+ $site + '/users').hasChild(auth.email.replace('.', ',1')) &&
                                    (root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1') + '/' + $type).val() == 'delete' || // Deleter has full reign
-                                   (newData.val() !== null && 
+                                   (newData.val() !== null &&
                                      root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1') + '/' + $type).val() == 'publish') || // Publish can do anything but delete
                                    (newData.child('publish_date').val() == null &&
                                      root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1') + '/' + $type).val() == 'draft'))",
                       }
                   },
                 },
+                "settings": {
+                  ".write": "(!root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1')).exists() && // Editor
+                  root.child('management/sites/'+ $site + '/users').hasChild(auth.email.replace('.', ',1'))) &&
+                  (root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1')) ||
+                  root.child('management/sites/' + $site + '/users').hasChild(auth.email.replace('.', ',1')))"
+                }, 
                 "$other": {
                   ".validate": false
                 },
@@ -94,13 +100,13 @@
                 // Users can submit a command per site, and makes sure the commands email is the same as the auth
                 ".validate": "newData.hasChildren(['dnsname'])",
                 "dnsname": {
-                 ".validate": "newData.isString()" 
+                 ".validate": "newData.isString()"
                 },
                 "id": {
                   ".validate": true
                 },
                 "$other": {
-                 ".validate": false 
+                 ".validate": false
                 }
               }
             },
@@ -110,10 +116,10 @@
                             root.child('management/sites/' + newData.child('siteref').val() + '/owners').hasChild(auth.email.replace('.', ',1'))",
                 ".validate": "newData.hasChildren(['userid', 'from_userid', 'siteref'])",
                 "userid": {
-                  ".validate": "newData.isString()" 
+                  ".validate": "newData.isString()"
                 },
                 "from_userid": {
-                  ".validate": "newData.isString()" 
+                  ".validate": "newData.isString()"
                 },
                 "siteref": {
                   ".validate": true
@@ -122,7 +128,7 @@
                   ".validate": true
                 },
                 "$other": {
-                 ".validate": false 
+                 ".validate": false
                 }
               }
             },
@@ -134,16 +140,16 @@
                 ".write": "!data.exists() || data.child('userid').val() == auth.email",
                 ".validate": "newData.hasChildren(['userid', 'sitename'])",
                 "userid": {
-                 ".validate": "newData.isString()" 
+                 ".validate": "newData.isString()"
                 },
                 "sitename": {
-                 ".validate": "newData.isString()" 
+                 ".validate": "newData.isString()"
                 },
                 "id": {
                  ".validate": true
                 },
                 "$other": {
-                 ".validate": false 
+                 ".validate": false
                 }
               }
             },
@@ -154,10 +160,10 @@
                 // Users can submit a command per site, and makes sure the commands email is the same as the auth
                 ".validate": "newData.hasChildren(['userid', 'sitename']) && newData.child('userid').val() == auth.email",
                 "userid": {
-                 ".validate": "newData.isString()" 
+                 ".validate": "newData.isString()"
                 },
                 "sitename": {
-                 ".validate": "newData.isString()" 
+                 ".validate": "newData.isString()"
                 },
                 "build_time" : {
                  ".validate": true
@@ -166,7 +172,7 @@
                  ".validate": true
                 },
                 "$other": {
-                 ".validate": false 
+                 ".validate": false
                 }
               }
             }
@@ -220,16 +226,16 @@
                 ".write": false,
                 "$message": {
                   "message": {
-                    ".validate": true 
+                    ".validate": true
                   },
                   "timestamp": {
                     ".validate": true
                   },
                   "status": {
-                    ".validate": true 
+                    ".validate": true
                   },
                   "code": {
-                    ".validate": true 
+                    ".validate": true
                   },
                   "$other": {
                     ".validate": false
@@ -241,10 +247,10 @@
                 ".write": "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))"
               },
               "$other": {
-                ".validate": false 
+                ".validate": false
               },
               "groups": {
-               ".write" : "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))" 
+               ".write" : "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))"
               },
               "permissions": {
                ".write": "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))"
@@ -255,7 +261,7 @@
               },
               ".validate": "newData.hasChildren(['owners']) && $site === $site.toLowerCase()",
               // Owners and users can read all the information in here, potential users can not
-             ".read": "data.exists() && (data.child('owners').hasChild(auth.email.replace('.', ',1')) || data.child('users').hasChild(auth.email.replace('.', ',1')))",             
+             ".read": "data.exists() && (data.child('owners').hasChild(auth.email.replace('.', ',1')) || data.child('users').hasChild(auth.email.replace('.', ',1')))",
               ".write": false
             }
           },
@@ -265,15 +271,15 @@
                 ".read": true
               },
               "sites": {
-                "users" : { 
+                "users" : {
                   "$site" : {
                     ".write": "$user === auth.email.replace('.', ',1') || root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))"
-                  }                  
+                  }
                 },
-                "owners" : {  
+                "owners" : {
                   "$site" : {
                     ".write": "$user === auth.email.replace('.', ',1') || root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))"
-                  }                 
+                  }
                 },
                 ".read": "$user === auth.email.replace('.', ',1')",
                 "$site" : {
