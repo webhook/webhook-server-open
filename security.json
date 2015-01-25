@@ -66,6 +66,7 @@
                                      root.child('management/sites/'+ $site + '/permissions/' + auth.email.replace('.', ',1') + '/' + $type).val() == 'draft'))",
                       }
                   },
+                },
               },
               ".write": "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))",
               // Anyone can read to it as long as its active
