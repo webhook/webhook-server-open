@@ -182,8 +182,7 @@
                 },
                 "$user": {
                   // Owners can only ever be added by owners ever dog
-                  ".write": "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))",
-                  ".validate": "(!data.parent().exists())"
+                  ".write": "root.child('management/sites/' + $site + '/owners').hasChild(auth.email.replace('.', ',1'))"
                 }
               },
               "users": {
